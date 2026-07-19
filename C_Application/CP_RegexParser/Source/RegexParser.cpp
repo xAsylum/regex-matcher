@@ -69,7 +69,7 @@ std::unique_ptr<RegexNode> RegexParser::constructRegexFromRPNotation(const std::
                 break;
             case ParsedSymbolType::JoinSymbol:
                 {
-                        auto l_first = std::unique_ptr<RegexNode>(l_stack.top());
+                    auto l_first = std::unique_ptr<RegexNode>(l_stack.top());
                     l_stack.pop();
                     auto l_second = std::unique_ptr<RegexNode> (l_stack.top());
                     l_stack.pop();

@@ -41,6 +41,16 @@ int RegexNode::getSubtreeSize()
     return m_subtreeSize;
 }
 
+const std::vector<std::unique_ptr<RegexNode>>& RegexNode::getChildNodes() 
+{
+    return m_childNodes;
+}
+
+bool RegexNode::isMarkNode()
+{
+    return false;
+}
+
 LeafNode::LeafNode() : 
     RegexNode(NodeType::Leaf), m_letter('.'), m_leafNodeType(LeafNodeType::WildcardNode) {}
 
@@ -65,5 +75,10 @@ OperatorNode::OperatorNode(OperatorNodeType p_operatorType, std::unique_ptr<Rege
     m_subtreeDepth = std::max(p_leftChild->getSubtreeDepth(), p_rightChild->getSubtreeDepth()) + 1;
     m_childNodes.push_back(std::move(p_leftChild));
     m_childNodes.push_back(std::move(p_rightChild));
+}
+
+bool OperatorNode::isMarkNode()
+{
+    return m_operatorType == OperatorNodeType::MarkNode;
 }
 }

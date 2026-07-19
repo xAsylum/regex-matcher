@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 
+
 #define DEBUG_PRINT
 namespace Regex
 {
@@ -35,9 +36,12 @@ void printGraph(const std::unique_ptr<RegexNode>&);
 class RegexNode
 {
 public:
+    const std::vector<std::unique_ptr<RegexNode>>& getChildNodes();
     NodeType getOperatorType();
+    virtual bool isMarkNode();
     int getSubtreeSize();
     int getSubtreeDepth();
+
 protected:
     RegexNode(NodeType);
     NodeType m_nodeType;
@@ -47,6 +51,7 @@ protected:
 private:
     int m_id;
     static int c_id;
+
 #ifdef DEBUG_PRINT
 friend void printGraph(const std::unique_ptr<RegexNode> &);
 #endif
@@ -69,6 +74,7 @@ class OperatorNode : public RegexNode
 public:
     OperatorNode(OperatorNodeType, std::unique_ptr<RegexNode>&&);
     OperatorNode(OperatorNodeType, std::unique_ptr<RegexNode>&&, std::unique_ptr<RegexNode>&&);
+    bool isMarkNode();
 private:
     OperatorNodeType m_operatorType;
 };
