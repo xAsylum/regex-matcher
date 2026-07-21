@@ -59,7 +59,7 @@ RegexNode* RegexNodeFactory::createJoinNode(std::unique_ptr<RegexNode>&& p_leftC
 
 RegexNode* RegexNodeFactory::createStarNode(std::unique_ptr<RegexNode>&& p_child)
 {
-    return new OperatorNode(OperatorNodeType::StarNode, std::move(p_child));
+    return new OperatorNode(OperatorNodeType::PlusNode, std::move(p_child));
 }
 
 RegexNode* RegexNodeFactory::createMarkNode(std::unique_ptr<RegexNode>&& p_child)

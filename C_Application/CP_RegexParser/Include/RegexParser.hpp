@@ -12,7 +12,7 @@ namespace Regex
         LetterSymbol,
         MarkSymbol,
         OptionalSymbol,
-        StarSymbol,
+        PlusSymbol,
         SumSymbol,
         JoinSymbol,
     };

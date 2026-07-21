@@ -7,29 +7,27 @@ namespace CFG
 
 enum GrammarSymbolType
 {
-    DotSymbol,
+    WildcardSymbol,
     LetterSymbol,
     UnionSymbol,
     JoinSymbol,
-    StarSymbol,
+    PlusSymbol,
 };
 
 struct GrammarSymbol
 {
+    GrammarSymbol(GrammarSymbolType);
     bool m_marked;
     GrammarSymbolType m_type;
+    bool m_nullable;
+    std::vector<int> m_unaryProductions;
 };
 
-union Product
-{
-    int m_singleProduction;
-    std::pair<int, int> m_doubleProduction;
-};
 
-struct Production
+struct BinaryProduction
 {
     int m_producingSymbol;
-    Product m_production;
+    std::pair<int, int> m_production;
 };
 
 class Grammar
@@ -40,12 +38,13 @@ private:
     int dfsInitializationHelperProcedure(const std::unique_ptr<Regex::RegexNode>&);
 
     std::vector<GrammarSymbol> m_symbols;
-    std::vector<Production> m_productions;
-    std::vector<int> m_letterSymbols[sizeof(char)];
-    std::vector<int> m_dotSymbols;
+    std::vector<BinaryProduction> m_binaryProductions;
+    std::vector<int> m_letterSymbols[256];
+    std::vector<int> m_wildcardSymbols;
     int m_startingSymbol;
 
 friend class GrammarFactory;
+friend std::ostream& operator<<(std::ostream&, const Grammar&);
 };
 
 class GrammarFactory
