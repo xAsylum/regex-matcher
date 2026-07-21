@@ -2,21 +2,9 @@
 #include <cassert>
 #include <cctype>
 #include <memory>
-#ifdef DEBUG_PRINT
-#include <iostream>
-#endif
+
 namespace Regex
 {
-#ifdef DEBUG_PRINT
-void printGraph(const std::unique_ptr<RegexNode>& p_parent)
-{
-    for(const auto &l_child : p_parent->m_childNodes)
-    {
-        std::cout << p_parent->m_id << " " << l_child->m_id << "\n";
-        printGraph(l_child);
-    }
-}
-#endif
 int RegexNode::c_id = 0;
 
 RegexNode::RegexNode(NodeType p_nodeType) : 
@@ -26,30 +14,26 @@ RegexNode::RegexNode(NodeType p_nodeType) :
     c_id++;
 }
 
-NodeType RegexNode::getOperatorType()
+NodeType RegexNode::getNodeType() const
 {
     return m_nodeType;
 }
 
-int RegexNode::getSubtreeDepth()
+int RegexNode::getSubtreeDepth() const
 {
     return m_subtreeDepth;
 }
 
-int RegexNode::getSubtreeSize()
+int RegexNode::getSubtreeSize() const
 {
     return m_subtreeSize;
 }
 
-const std::vector<std::unique_ptr<RegexNode>>& RegexNode::getChildNodes() 
+const std::vector<std::unique_ptr<RegexNode>>& RegexNode::getChildNodes() const
 {
     return m_childNodes;
 }
 
-bool RegexNode::isMarkNode()
-{
-    return false;
-}
 
 LeafNode::LeafNode() : 
     RegexNode(NodeType::Leaf), m_letter('.'), m_leafNodeType(LeafNodeType::WildcardNode) {}
@@ -77,8 +61,24 @@ OperatorNode::OperatorNode(OperatorNodeType p_operatorType, std::unique_ptr<Rege
     m_childNodes.push_back(std::move(p_rightChild));
 }
 
-bool OperatorNode::isMarkNode()
+bool OperatorNode::isMarkNode() const
 {
     return m_operatorType == OperatorNodeType::MarkNode;
 }
+
+OperatorNodeType OperatorNode::getNodeOperatorType() const
+{
+    return m_operatorType;
+}
+
+char LeafNode::getLeafNodeLetter() const
+{
+    return m_letter;
+}
+
+bool LeafNode::isLeafNodeWildcard() const
+{
+    return m_leafNodeType == WildcardNode;
+}
+
 }

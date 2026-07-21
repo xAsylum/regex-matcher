@@ -15,7 +15,7 @@ ParsedSymbolType RegexParser::getParsedSymbolType(char p_nextChar)
     {
         return ParsedSymbolType::WildcardSymbol;
     }
-    else if (p_nextChar == '+')
+    else if (p_nextChar == '|')
     {
         return ParsedSymbolType::SumSymbol;
     }
@@ -31,9 +31,9 @@ ParsedSymbolType RegexParser::getParsedSymbolType(char p_nextChar)
     {
         return ParsedSymbolType::OptionalSymbol;
     }
-    else if (p_nextChar == '*')
+    else if (p_nextChar == '+')
     {
-        return ParsedSymbolType::StarSymbol;
+        return ParsedSymbolType::PlusSymbol;
     }
     else if (std::isalnum(p_nextChar))
     {
@@ -73,10 +73,10 @@ std::unique_ptr<RegexNode> RegexParser::constructRegexFromRPNotation(const std::
                     l_stack.pop();
                     auto l_second = std::unique_ptr<RegexNode> (l_stack.top());
                     l_stack.pop();
-                    l_stack.push(l_factory.createSumNode(std::move(l_second), std::move(l_first)));
+                    l_stack.push(l_factory.createJoinNode(std::move(l_second), std::move(l_first)));
                 }
                 break;
-            case ParsedSymbolType::StarSymbol:
+            case ParsedSymbolType::PlusSymbol:
                 {
                     auto l_top = std::unique_ptr<RegexNode>(l_stack.top());
                     l_stack.pop();

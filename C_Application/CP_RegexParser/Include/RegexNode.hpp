@@ -2,8 +2,6 @@
 #include <vector>
 #include <memory>
 
-
-#define DEBUG_PRINT
 namespace Regex
 {
 
@@ -18,7 +16,7 @@ enum OperatorNodeType
 {
     MarkNode,
     OptionalNode,
-    StarNode,
+    PlusNode,
     SumNode,
     JoinNode
 };
@@ -28,19 +26,17 @@ enum LeafNodeType
     LetterNode,
     WildcardNode
 };
-#ifdef DEBUG_PRINT
-class RegexNode;
 
-void printGraph(const std::unique_ptr<RegexNode>&);
-#endif
 class RegexNode
 {
 public:
-    const std::vector<std::unique_ptr<RegexNode>>& getChildNodes();
-    NodeType getOperatorType();
-    virtual bool isMarkNode();
-    int getSubtreeSize();
-    int getSubtreeDepth();
+    virtual ~RegexNode() = default;
+    
+    const std::vector<std::unique_ptr<RegexNode>>& getChildNodes() const;
+    NodeType getNodeType() const;
+
+    int getSubtreeSize() const;
+    int getSubtreeDepth() const;
 
 protected:
     RegexNode(NodeType);
@@ -52,9 +48,8 @@ private:
     int m_id;
     static int c_id;
 
-#ifdef DEBUG_PRINT
-friend void printGraph(const std::unique_ptr<RegexNode> &);
-#endif
+friend std::ostream& operator<<(std::ostream&, const RegexNode&);
+friend void printRegexNodeRecursive(std::ostream&, const RegexNode&, int);
 };
 
 
@@ -63,10 +58,13 @@ class LeafNode : public RegexNode
 public:
     LeafNode();
     LeafNode(char);
-    char getLetter();
+    char getLeafNodeLetter() const;
+    bool isLeafNodeWildcard() const;
 private:
     char m_letter;
     LeafNodeType m_leafNodeType;
+
+friend void printRegexNodeRecursive(std::ostream&, const RegexNode&, int);
 };
 
 class OperatorNode : public RegexNode
@@ -74,9 +72,12 @@ class OperatorNode : public RegexNode
 public:
     OperatorNode(OperatorNodeType, std::unique_ptr<RegexNode>&&);
     OperatorNode(OperatorNodeType, std::unique_ptr<RegexNode>&&, std::unique_ptr<RegexNode>&&);
-    bool isMarkNode();
+    bool isMarkNode() const;
+    OperatorNodeType getNodeOperatorType() const;
 private:
     OperatorNodeType m_operatorType;
+    
+friend void printRegexNodeRecursive(std::ostream&, const RegexNode&, int);
 };
 
 }
