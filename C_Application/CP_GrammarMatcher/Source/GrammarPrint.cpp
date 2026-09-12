@@ -29,9 +29,17 @@ inline std::ostream& operator<<(std::ostream& p_ostream, const GrammarSymbol& p_
         p_ostream << char('A' + p_grammarSymbol.m_unaryProductions[l_id])
            << (l_id + 1 < p_grammarSymbol.m_unaryProductions.size() ? ", " : "");
     }
+    
+    p_ostream << "], Transitive Complement Producers: [";
+    
+    for (size_t l_id = 0; l_id < p_grammarSymbol.m_transiviteComplementListOfUnaryProducers.size(); ++l_id)
+    {
+        p_ostream << char('A' + p_grammarSymbol.m_transiviteComplementListOfUnaryProducers[l_id])
+           << (l_id + 1 < p_grammarSymbol.m_transiviteComplementListOfUnaryProducers.size() ? ", " : "");
+    }
+    
     return p_ostream << "] }";
 }
-
 
 std::ostream& operator<<(std::ostream& p_ostream, const Grammar& p_grammar)
 {

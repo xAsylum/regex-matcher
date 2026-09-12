@@ -20,6 +20,7 @@ struct GrammarSymbol
     bool m_marked;
     GrammarSymbolType m_type;
     bool m_nullable;
+    std::vector<int> m_transiviteComplementListOfUnaryProducers;
     std::vector<int> m_unaryProductions;
 };
 
@@ -33,10 +34,15 @@ struct BinaryProduction
 class Grammar
 {
 public:
+    const std::vector<GrammarSymbol>& getGrammarSymbols();
+    const std::vector<int>& getLetterSymbols(char);
+    const std::vector<int>& getWildcardSymbols();
+    const std::vector<BinaryProduction>& getBinaryProductions();
+    int getStartingSymbol();
 
 private:
     int dfsInitializationHelperProcedure(const std::unique_ptr<Regex::RegexNode>&);
-
+    void transitiveComplementOfUnaryProducers();
     std::vector<GrammarSymbol> m_symbols;
     std::vector<BinaryProduction> m_binaryProductions;
     std::vector<int> m_letterSymbols[256];
