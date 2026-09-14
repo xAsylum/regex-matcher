@@ -39,7 +39,7 @@ ParsedSymbolType RegexParser::getParsedSymbolType(char p_nextChar)
     {
         return ParsedSymbolType::LetterSymbol;
     }
-    return ParsedSymbolType::UnknownSymbol;
+    return ParsedSymbolType::LetterSymbol;
 }
 // For now Regex is parsed from RPN
 std::unique_ptr<RegexNode> RegexParser::constructRegexPattern(const std::string& p_patternInInfixNotation)

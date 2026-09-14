@@ -20,33 +20,34 @@ struct GrammarSymbol
     bool m_marked;
     GrammarSymbolType m_type;
     bool m_nullable;
-    std::vector<int> m_transiviteComplementListOfUnaryProducers;
-    std::vector<int> m_unaryProductions;
+    std::vector<unsigned> m_transiviteComplementListOfUnaryProducers;
+    std::vector<unsigned> m_transiviteComplementListOfUnaryProductions;
+    std::vector<unsigned> m_unaryProductions;
 };
 
 
 struct BinaryProduction
 {
-    int m_producingSymbol;
-    std::pair<int, int> m_production;
+    unsigned m_producingSymbol;
+    std::pair<unsigned, unsigned> m_production;
 };
 
 class Grammar
 {
 public:
     const std::vector<GrammarSymbol>& getGrammarSymbols();
-    const std::vector<int>& getLetterSymbols(char);
-    const std::vector<int>& getWildcardSymbols();
+    const std::vector<unsigned>& getLetterSymbols(char);
+    const std::vector<unsigned>& getWildcardSymbols();
     const std::vector<BinaryProduction>& getBinaryProductions();
     int getStartingSymbol();
 
 private:
     int dfsInitializationHelperProcedure(const std::unique_ptr<Regex::RegexNode>&);
-    void transitiveComplementOfUnaryProducers();
+    void transitiveComplementOfUnaryProducersAndProductions();
     std::vector<GrammarSymbol> m_symbols;
     std::vector<BinaryProduction> m_binaryProductions;
-    std::vector<int> m_letterSymbols[256];
-    std::vector<int> m_wildcardSymbols;
+    std::vector<unsigned> m_letterSymbols[256];
+    std::vector<unsigned> m_wildcardSymbols;
     int m_startingSymbol;
 
 friend class GrammarFactory;

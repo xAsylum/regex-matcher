@@ -10,7 +10,7 @@ GrammarSymbol::GrammarSymbol(GrammarSymbolType p_type) : m_type(p_type) {};
 int Grammar::dfsInitializationHelperProcedure(
     const std::unique_ptr<Regex::RegexNode>& p_root)
 {
-    int l_idx = m_symbols.size();
+    unsigned l_idx = m_symbols.size();
     auto l_nodeType = p_root->getNodeType();
     bool l_isMarkNode = (l_nodeType == Regex::NodeType::UnaryOperator
         and static_cast<Regex::OperatorNode*>(p_root.get())->isMarkNode());
@@ -40,7 +40,7 @@ int Grammar::dfsInitializationHelperProcedure(
     else if(l_nodeType == Regex::UnaryOperator)
     {
         m_symbols.emplace_back(GrammarSymbolType::PlusSymbol);
-        int l_childIdx = dfsInitializationHelperProcedure(p_root->getChildNodes()[0]);
+        unsigned l_childIdx = dfsInitializationHelperProcedure(p_root->getChildNodes()[0]);
         m_binaryProductions.emplace_back(BinaryProduction
             {
                 .m_producingSymbol = l_idx,
@@ -77,7 +77,7 @@ std::unique_ptr<Grammar> GrammarFactory::parseFromRegex(
 {
     Grammar* l_result = new Grammar();
     l_result->m_startingSymbol = l_result->dfsInitializationHelperProcedure(p_regexTree);
-    l_result->transitiveComplementOfUnaryProducers();
+    l_result->transitiveComplementOfUnaryProducersAndProductions();
     return std::unique_ptr<Grammar>(l_result);
 }
 
@@ -85,11 +85,11 @@ const std::vector<GrammarSymbol>& Grammar::getGrammarSymbols()
 {
     return this->m_symbols;
 }
-const std::vector<int>& Grammar::getLetterSymbols(char p_letter)
+const std::vector<unsigned>& Grammar::getLetterSymbols(char p_letter)
 {
     return this->m_letterSymbols[unsigned(p_letter)];
 }
-const std::vector<int>& Grammar::getWildcardSymbols()
+const std::vector<unsigned>& Grammar::getWildcardSymbols()
 {
     return this->m_wildcardSymbols;
 }
@@ -102,21 +102,21 @@ int Grammar::getStartingSymbol()
     return this->m_startingSymbol;
 }
 
-void Grammar::transitiveComplementOfUnaryProducers()
+void Grammar::transitiveComplementOfUnaryProducersAndProductions()
 {
     // This will use Warshall-Floyd algorithm. I'm aware that there is more efficient approach, 
     // but this will do for the sake of this project and grammar preprocessing.
     const unsigned l_graphSize = m_symbols.size();
     std::vector<std::vector<bool>> l_adjacencyMatrix(l_graphSize, 
         std::vector<bool>(l_graphSize, false));
-    for (unsigned l_symbolIdx = 0; l_symbolIdx < l_graphSize; l_symbolIdx++)
+    for (unsigned l_sourceIdx = 0; l_sourceIdx < l_graphSize; l_sourceIdx++)
     {
-        const auto& l_symbol = m_symbols[l_symbolIdx];
-        for (unsigned l_destination : l_symbol.m_unaryProductions)
+        const auto& l_sourceSymbol = m_symbols[l_sourceIdx];
+        for (unsigned l_destinationIdx : l_sourceSymbol.m_unaryProductions)
         {
-            l_adjacencyMatrix[l_destination][l_symbolIdx] = true;
+            l_adjacencyMatrix[l_destinationIdx][l_sourceIdx] = true;
         }
-        l_adjacencyMatrix[l_symbolIdx][l_symbolIdx] = true;
+        l_adjacencyMatrix[l_sourceIdx][l_sourceIdx] = true;
     }
     for (unsigned l_mid = 0; l_mid < l_graphSize; l_mid++)
     {
@@ -129,15 +129,14 @@ void Grammar::transitiveComplementOfUnaryProducers()
             }
         }
     }
-    for (unsigned l_symbolIdx = 0; l_symbolIdx < l_graphSize; l_symbolIdx++)
+    for (unsigned l_sourceIdx = 0; l_sourceIdx < l_graphSize; l_sourceIdx++)
     {
-        auto& l_symbol = m_symbols[l_symbolIdx];
-        
-        for (unsigned l_destination = 0; l_destination < l_graphSize; l_destination++)
+        for (unsigned l_destinationIdx = 0; l_destinationIdx < l_graphSize; l_destinationIdx++)
         {
-            if (l_adjacencyMatrix[l_symbolIdx][l_destination] and l_symbolIdx != l_destination)
+            if (l_adjacencyMatrix[l_sourceIdx][l_destinationIdx] and l_sourceIdx != l_destinationIdx)
             {
-                l_symbol.m_transiviteComplementListOfUnaryProducers.push_back(l_destination);
+                m_symbols[l_sourceIdx].m_transiviteComplementListOfUnaryProducers.push_back(l_destinationIdx);
+                m_symbols[l_destinationIdx].m_transiviteComplementListOfUnaryProductions.push_back(l_sourceIdx);
             }
         }
     }
